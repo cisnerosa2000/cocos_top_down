@@ -33,6 +33,11 @@ class GameLayer(Layer):
         self.player_sprite.mode = "idle"
         self.index = 0
         self.player_sprite.weapon = self.player_inventory[self.index]
+        
+        self.scroller = ScrollingManager()
+        self.add(self.scroller)
+        
+        
     def update(self,dt):
         #gameloop
         
