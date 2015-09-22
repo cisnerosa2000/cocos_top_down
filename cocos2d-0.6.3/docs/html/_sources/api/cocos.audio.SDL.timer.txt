@@ -1,7 +1,0 @@
-cocos.audio.SDL.timer module
-============================
-
-.. automodule:: cocos.audio.SDL.timer
-    :members:
-    :undoc-members:
-    :show-inheritance:

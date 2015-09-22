@@ -1,7 +1,0 @@
-cocos.layer.scrolling module
-============================
-
-.. automodule:: cocos.layer.scrolling
-    :members:
-    :undoc-members:
-    :show-inheritance:

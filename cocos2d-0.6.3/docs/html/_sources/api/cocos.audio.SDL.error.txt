@@ -1,7 +1,0 @@
-cocos.audio.SDL.error module
-============================
-
-.. automodule:: cocos.audio.SDL.error
-    :members:
-    :undoc-members:
-    :show-inheritance:

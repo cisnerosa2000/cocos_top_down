@@ -1,7 +1,0 @@
-cocos.grid module
-=================
-
-.. automodule:: cocos.grid
-    :members:
-    :undoc-members:
-    :show-inheritance:
