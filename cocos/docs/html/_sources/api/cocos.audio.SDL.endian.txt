@@ -1,7 +1,0 @@
-cocos.audio.SDL.endian module
-=============================
-
-.. automodule:: cocos.audio.SDL.endian
-    :members:
-    :undoc-members:
-    :show-inheritance:
