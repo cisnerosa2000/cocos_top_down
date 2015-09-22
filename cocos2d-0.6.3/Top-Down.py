@@ -25,7 +25,7 @@ class GameLayer(Layer):
         super(GameLayer, self).__init__()
         self.schedule(self.update)
         self.mouse_x,self.mouse_y = 0,0
-        self.player_sprite = Sprite('resources/doge.gif',position=(400,304))
+        self.player_sprite = Sprite('resources/player_sprites.gif',position=(400,304))
         self.add(self.player_sprite)
         self.chars_pressed = set()
         
@@ -40,8 +40,7 @@ class GameLayer(Layer):
         #
         ##
         ### show the right sprite for movement
-        self.sprite_path = "resources/player_sprites/%s/%s" % (self.player_inventory[self.index],self.player_sprite.mode)
-        print self.sprite_path
+      #  self.sprite_path = "resources/player_sprites/%s/%s" % (self.player_inventory[self.index],self.player_sprite.mode)
         
         
         
