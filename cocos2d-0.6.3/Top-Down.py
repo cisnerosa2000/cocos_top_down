@@ -25,7 +25,7 @@ class GameLayer(Layer):
         super(GameLayer, self).__init__()
         self.schedule(self.update)
         self.mouse_x,self.mouse_y = 0,0
-        self.player_sprite = Sprite('resources/player_sprites.gif',position=(400,304))
+        self.player_sprite = Sprite('resources/player_sprites/player.gif',position=(400,304))
         self.add(self.player_sprite)
         self.chars_pressed = set()
         
@@ -40,8 +40,7 @@ class GameLayer(Layer):
         #
         ##
         ### show the right sprite for movement
-      #  self.sprite_path = "resources/player_sprites/%s/%s" % (self.player_inventory[self.index],self.player_sprite.mode)
-        
+         
         
         
         ### show the right sprite for movement
@@ -56,7 +55,7 @@ class GameLayer(Layer):
         self.player_vector = [self.mouse_x-self.player_sprite.x,self.mouse_y-self.player_sprite.y]
         self.angle = math.atan2(*self.player_vector)
         self.angle *= one_eighty_over_pi
-        self.player_sprite.do(RotateTo(self.angle,0))
+        self.player_sprite.do(RotateTo(self.angle-95,0))
          ### point player towards mouse
          ##
          #
