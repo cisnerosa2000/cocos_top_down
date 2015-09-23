@@ -5,6 +5,9 @@ from cocos.sprite import *
 from cocos.actions import *
 import cocos.tiles
 
+import cocos.euclid as eu
+import cocos.collision_model as cm
+
 import cocos
 import math
 
@@ -41,7 +44,7 @@ class GameLayer(ScrollableLayer):
         self.scroller = ScrollingManager()
         self.add(self.scroller,z=-1)
         
-        self.map = cocos.tiles.load('resources/map.tmx')['1']
+        self.map = cocos.tiles.load('lvl1.tmx')['1']
         self.scroller.add(self.map,0,'test')
         
         
@@ -49,7 +52,7 @@ class GameLayer(ScrollableLayer):
         ##
         #
         
-        #self.view_w = 800
+        #self.view_w = 608
         #self.view_h = 608
         
         
@@ -81,7 +84,12 @@ class GameLayer(ScrollableLayer):
         
         self.index = 0
         self.player_sprite.weapon = self.weapon_inventory[self.index]
-       
+        string ='resources/weapon_sprites/%s.png' % self.player_sprite.weapon
+        self.current_weapon = Sprite(string)
+        self.current_weapon.do(RotateBy(90,0))
+        self.current_weapon.do(MoveBy((20,-14),0))
+        self.player_sprite.add(self.current_weapon)
+        
         
         
         
