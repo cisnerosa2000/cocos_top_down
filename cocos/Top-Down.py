@@ -20,10 +20,17 @@ RIGHT = 65363
 UP = 65362
 DOWN = 65364
 SPACE = 32
+
 A = 97
 D = 100
 W = 119
 S = 115
+
+ONE = 49
+TWO = 50
+THREE = 51
+FOUR = 52
+FIVE = 53
 
 one_eighty_over_pi = 57.2957795131
 
@@ -31,6 +38,24 @@ one_eighty_over_pi = 57.2957795131
 ##
 #
 
+class Slot(object):
+    def __init__(self,position,selected):
+        self.selected = selected
+        self.position = position
+        if self.selected:
+            self.img = Sprite("resources/UI/slot2.png",position=position)
+        else:
+            self.img = Sprite("resources/UI/slot1.png",position=position)
+        self.item = None
+    def update(self):
+        if self.selected:
+            self.img = Sprite("resources/UI/slot2.png",position=self.position)
+        else:
+            self.img = Sprite("resources/UI/slot1.png",position=self.position)
+    
+    
+        
+        
 class GameLayer(ScrollableLayer):
     is_event_handler = True
     def __init__(self):
@@ -45,50 +70,54 @@ class GameLayer(ScrollableLayer):
         self.add(self.scroller,z=-1)
         
         self.map = cocos.tiles.load('lvl1.tmx')['1']
-        self.scroller.add(self.map,0,'test')
+        self.scroller.add(self.map,-1,'test')
         
         
         ### Load Map
         ##
         #
         
-        #self.view_w = 608
-        #self.view_h = 608
+        #
+        ##
+        ### Inventory/HUD
+        
+        
+        self.hud_layer = cocos.layer.ColorLayer(255, 0, 0, 255, width=100, height=2)     
+        self.hud_layer.opacity = 100   
+        game_scene.add(self.hud_layer,z=1)
+        
+       
+        self.slots = {
+            1:Slot(position=(736,456),selected=True),
+            2:Slot(position=(736,392),selected=False),
+            3:Slot(position=(736,328),selected=False),
+            4:Slot(position=(736,264),selected=False),
+            5:Slot(position=(736,200),selected=False)
+        }
+        
+        for slot in self.slots:
+            self.hud_layer.add(self.slots[slot].img)
         
         
         
         
         
-        self.player_sprite = Sprite('resources/player_sprites/player.gif',position=(400,304))
+        
+        ### Inventory/HUD
+        ##
+        #
+        
+        self.player_sprite = Sprite('resources/player_sprites/player.png',position=(400,304))
         self.add(self.player_sprite)
         self.chars_pressed = set()
         
         
-        self.weapon_inventory = ["rifle","shotgun","handgun"]
-        self.weapon_capacities = {
-            "rifle":30,
-            "shotgun":8,
-            "handgun":15
-        }
-        self.ammo = {
-            "rifle":120,
-            "shotgun":16,
-            "handgun":45
-        }
         
-        self.magazines = {
-            "rifle":30,
-            "shotgun":8,
-            "handgun":15
-        }
+        self.magazine = 30
+        self.ammo = 120
         
-        self.index = 0
-        self.player_sprite.weapon = self.weapon_inventory[self.index]
-        string ='resources/weapon_sprites/%s.png' % self.player_sprite.weapon
-        self.current_weapon = Sprite(string)
-       # self.current_weapon.do(RotateBy(90,0))
-       # self.current_weapon.do(MoveBy((20,-17),0))
-        self.player_sprite.add(self.current_weapon)
+        self.rifle = Sprite("resources/weapon_sprites/rifle.png")
+        self.player_sprite.add(self.rifle)
         
         
         
@@ -104,6 +133,7 @@ class GameLayer(ScrollableLayer):
         
         x = self.player_sprite.position[0]
         y = self.player_sprite.position[1]
+        
         
         
         #
@@ -144,7 +174,14 @@ class GameLayer(ScrollableLayer):
             y -= 5
         if D in self.chars_pressed:
             x += 5
+        
+      
+        
+        
+        
         self.player_sprite.position = x,y
+        
+        
         
         self.scroller.set_focus(x,y)
         self.set_view(x, y, x+800, y+608, viewport_ox=400, viewport_oy=304)
@@ -155,7 +192,52 @@ class GameLayer(ScrollableLayer):
         #
         
         
+        #
+        ##
+        ### inventory 
         
+        for i in self.slots:
+            self.hud_layer.remove(self.slots[i].img)
+        
+        if ONE  in self.chars_pressed:
+            for i in self.slots:
+                self.slots[i].selected = False
+            self.slots[1].selected = True
+            for i in self.slots:
+                self.slots[i].update()
+        if TWO  in self.chars_pressed:
+            for i in self.slots:
+                self.slots[i].selected = False
+            self.slots[2].selected = True
+            for i in self.slots:
+                self.slots[i].update()
+        if THREE  in self.chars_pressed:
+            for i in self.slots:
+                self.slots[i].selected = False
+            self.slots[3].selected = True
+            for i in self.slots:
+                self.slots[i].update()
+        if FOUR  in self.chars_pressed:
+            for i in self.slots:
+                self.slots[i].selected = False
+            self.slots[4].selected = True
+            for i in self.slots:
+                self.slots[i].update()
+        if FIVE  in self.chars_pressed:
+            for i in self.slots:
+                self.slots[i].selected = False
+            self.slots[5].selected = True
+            for i in self.slots:
+                self.slots[i].update()
+       
+        
+        for i in self.slots:
+            if self.slots[i].img not in self.hud_layer:
+                self.hud_layer.add(self.slots[i].img)
+        
+        ### inventory
+        ##
+        #
         
         
        
@@ -164,10 +246,7 @@ class GameLayer(ScrollableLayer):
        
        
     def on_mouse_press (self, x, y, buttons, modifiers):
-        if self.index < 1:
-            self.fire("auto")
-        else:
-            self.fire("semi")
+        self.fire()
         
     def on_mouse_motion(self,x,y,dx,dy):
         self.mouse_x,self.mouse_y = director.get_virtual_coordinates(x, y)
@@ -176,11 +255,9 @@ class GameLayer(ScrollableLayer):
         self.chars_pressed.add(key)
     def on_key_release(self,key,modifiers):
         self.chars_pressed.remove(key)
-    def fire(self,mode):
-        if mode == "auto":
-            pass
-        elif mode == "semi":
-            pass
+    def fire(self):
+        pass
+        
         
 
 
@@ -189,5 +266,6 @@ class GameLayer(ScrollableLayer):
 
 if __name__ == "__main__":
     director.init(width=800,height=608,caption="Top-Down")
-    game_scene = Scene(GameLayer())
+    game_scene = Scene()
+    game_scene.add(GameLayer())
     director.run(game_scene)
