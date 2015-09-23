@@ -326,6 +326,7 @@ def load_tmx(filename):
                 resource.add_resource(name, tileset)
             elif c.tag == 'tile':
                 # add properties to tiles in the tileset
+                
                 gid = tileset.firstgid + int(c.attrib['id'])
                 tile = tileset[gid]
                 props = c.find('properties')
