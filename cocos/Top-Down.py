@@ -86,8 +86,8 @@ class GameLayer(ScrollableLayer):
         self.player_sprite.weapon = self.weapon_inventory[self.index]
         string ='resources/weapon_sprites/%s.png' % self.player_sprite.weapon
         self.current_weapon = Sprite(string)
-        self.current_weapon.do(RotateBy(90,0))
-        self.current_weapon.do(MoveBy((20,-14),0))
+       # self.current_weapon.do(RotateBy(90,0))
+       # self.current_weapon.do(MoveBy((20,-17),0))
         self.player_sprite.add(self.current_weapon)
         
         
