@@ -3,6 +3,8 @@ from cocos.scene import *
 from cocos.layer import *
 from cocos.sprite import *
 from cocos.actions import *
+from cocos.particle_systems import *
+
 import cocos.tiles
 import cocos.text
 
@@ -41,7 +43,20 @@ one_eighty_over_pi = 57.2957795131
 ##
 #
 
+class PlayerCollider(cocos.tiles.RectMapCollider):
+   def __init__(self, player):
+       self.player = player
 
+   def collide_bottom(self, dy):
+       print "bottom"
+   def collide_left(self, dx):
+       print "left"
+
+   def collide_right(self, dx):
+       print "right"
+
+   def collide_top(self, dy):
+       print "top"
 
 
 class Enemy(object):
@@ -81,6 +96,10 @@ class GameLayer(ScrollableLayer):
         self.schedule(self.update)
         self.mouse_x,self.mouse_y = 0,0
         
+        
+    
+        
+        
         #
         ##
         ### Load Map
@@ -100,7 +119,7 @@ class GameLayer(ScrollableLayer):
         ##
         ### Inventory/HUD
         
-        self.hud_layer = cocos.layer.ColorLayer(255, 0, 0, 255, width=100, height=2)     
+        self.hud_layer = cocos.layer.ColorLayer(255, 0, 0, 255, width=1, height=1)     
         self.hud_layer.opacity = 100   
         game_scene.add(self.hud_layer,z=1)
         
@@ -153,7 +172,7 @@ class GameLayer(ScrollableLayer):
         #
         ##
         ### Collision
-        
+        self.collider = PlayerCollider(self.player_sprite)
         
         self.collision_manager = cm.CollisionManagerBruteForce()
         self.player_sprite.cshape = cm.AARectShape(
@@ -162,6 +181,8 @@ class GameLayer(ScrollableLayer):
             self.player_sprite.height//2
         )
         self.collision_manager.add(self.player_sprite)
+        
+      
         
         ### Collision
         ##
@@ -180,9 +201,11 @@ class GameLayer(ScrollableLayer):
         #
         
         
+        self.p = Sun()
+        self.p.position = (400,400)
+        self.map.add(self.p)
         
-        
-        
+
         
         
     
@@ -199,11 +222,15 @@ class GameLayer(ScrollableLayer):
         
         #
         ##
-        ### show the right sprite for movement
+        ### collision
+        
+        self.player_sprite.cshape.center = self.player_sprite.position
+        collisions = self.collision_manager.objs_colliding(self.player_sprite)
+        if collisions:
+            print collisions
         
         
-        
-        ### show the right sprite for movement
+        ### collision
         ##
         #
         
@@ -224,7 +251,7 @@ class GameLayer(ScrollableLayer):
          
         #
         ##
-        ### move player
+        ### move player and handle map collision
         
         
         if W in self.chars_pressed:
@@ -240,7 +267,17 @@ class GameLayer(ScrollableLayer):
         
         
         
+        
+        self.last = self.player_sprite.get_rect()
+        
         self.player_sprite.position = x,y
+        
+        self.new = self.last.copy()
+        self.new.x = x
+        self.new.y = y
+        
+        self.collider.collide_map(self.map, self.last, self.new, self.last.x-x, self.last.y-y)
+        
         
         
         
@@ -248,7 +285,7 @@ class GameLayer(ScrollableLayer):
         self.set_view(x, y, x+800, y+608, viewport_ox=400, viewport_oy=304)
         self.scroller.get('test').set_view(0, 0, 800, 800, -x, -y)
              
-        ### move player
+        ### move player and handle map collision
         ##
         #
         
@@ -256,6 +293,8 @@ class GameLayer(ScrollableLayer):
         #
         ##
         ### inventory 
+        self.kills_label = cocos.text.Label(text='%d Kills' % self.kills,position=(736,130),font_size=15)
+        
         
         for i in self.slots:
             self.hud_layer.remove(self.slots[i].img)
@@ -315,9 +354,15 @@ class GameLayer(ScrollableLayer):
     def on_mouse_drag (self, x, y, dx, dy, buttons, modifiers):
         self.mouse_x,self.mouse_y = x,y       
     def on_key_press(self,key,modifiers):
-        self.chars_pressed.add(key)
+        try:
+            self.chars_pressed.add(key)
+        except:
+            pass
     def on_key_release(self,key,modifiers):
-        self.chars_pressed.remove(key)
+        try:
+            self.chars_pressed.remove(key)
+        except:
+            pass
     def fire(self):
         pass
         
@@ -328,7 +373,7 @@ class GameLayer(ScrollableLayer):
 
 
 if __name__ == "__main__":
-    director.init(width=800,height=608,caption="Top-Down")
+    director.init(width=800,height=608,caption="Top-Down",fullscreen=False)
     game_scene = Scene()
     game_scene.add(GameLayer())
     director.run(game_scene)
