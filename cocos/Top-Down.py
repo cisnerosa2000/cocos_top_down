@@ -4,12 +4,15 @@ from cocos.layer import *
 from cocos.sprite import *
 from cocos.actions import *
 import cocos.tiles
+import cocos.text
 
-import cocos.euclid as eu
 import cocos.collision_model as cm
 
 import cocos
 import math
+import numpy
+from heapq import *
+
 
 
 #
@@ -37,6 +40,21 @@ one_eighty_over_pi = 57.2957795131
 ### Declaring some global variables that will be very useful later
 ##
 #
+
+
+
+
+class Enemy(object):
+    def __init__(self,x,y):
+        self.health = 3
+        self.x = x
+        self.y = y
+        self.img = Sprite('resources/player_sprites/zombie.png',position = (self.x,self.y))
+        
+        
+        
+        
+        
 
 class Slot(object):
     def __init__(self,position,selected):
@@ -73,6 +91,7 @@ class GameLayer(ScrollableLayer):
         self.scroller.add(self.map,-1,'test')
         
         
+        
         ### Load Map
         ##
         #
@@ -80,7 +99,6 @@ class GameLayer(ScrollableLayer):
         #
         ##
         ### Inventory/HUD
-        
         
         self.hud_layer = cocos.layer.ColorLayer(255, 0, 0, 255, width=100, height=2)     
         self.hud_layer.opacity = 100   
@@ -99,15 +117,21 @@ class GameLayer(ScrollableLayer):
             self.hud_layer.add(self.slots[slot].img)
         
         
-        
-        
+    
+        self.round = 1
+        self.round_label = cocos.text.Label(text='%s' % self.round,position=(36,130),font_size=15)
+        self.hud_layer.add(self.round_label)
         
         
         ### Inventory/HUD
         ##
         #
         
-        self.player_sprite = Sprite('resources/player_sprites/player.png',position=(400,304))
+        #
+        ##
+        ### Player 
+        
+        self.player_sprite = Sprite('resources/player_sprites/player.png',position=(200,240))
         self.add(self.player_sprite)
         self.chars_pressed = set()
         
@@ -118,6 +142,41 @@ class GameLayer(ScrollableLayer):
         
         self.rifle = Sprite("resources/weapon_sprites/rifle.png")
         self.player_sprite.add(self.rifle)
+        
+        ###
+        ##
+        #
+        
+        
+        #
+        ##
+        ### Collision
+        
+        
+        self.collision_manager = cm.CollisionManagerBruteForce()
+        self.player_sprite.cshape = cm.AARectShape(
+            self.player_sprite.position,
+            self.player_sprite.width//2,
+            self.player_sprite.height//2
+        )
+        self.collision_manager.add(self.player_sprite)
+        
+        ### Collision
+        ##
+        #
+        
+        
+        #
+        ##
+        ### Setting up enemy batch
+        
+        self.batch = cocos.batch.BatchNode()
+        self.add(self.batch,z=1)
+        
+        ### Setting up enemy batch
+        ##
+        #
+        
         
         
         
@@ -167,14 +226,14 @@ class GameLayer(ScrollableLayer):
         
         
         if W in self.chars_pressed:
-            y += 5
+            y += 4
         if A in self.chars_pressed:
-            x -= 5
+            x -= 4
         if S in self.chars_pressed:
-            y -= 5
+            y -= 4
         if D in self.chars_pressed:
-            x += 5
-        
+            x += 4
+    
       
         
         
@@ -250,7 +309,9 @@ class GameLayer(ScrollableLayer):
         
     def on_mouse_motion(self,x,y,dx,dy):
         self.mouse_x,self.mouse_y = director.get_virtual_coordinates(x, y)
-        
+
+    def on_mouse_drag (self, x, y, dx, dy, buttons, modifiers):
+        self.mouse_x,self.mouse_y = x,y       
     def on_key_press(self,key,modifiers):
         self.chars_pressed.add(key)
     def on_key_release(self,key,modifiers):
