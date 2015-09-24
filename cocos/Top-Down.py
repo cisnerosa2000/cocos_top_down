@@ -118,9 +118,9 @@ class GameLayer(ScrollableLayer):
         
         
     
-        self.round = 1
-        self.round_label = cocos.text.Label(text='%s' % self.round,position=(36,130),font_size=15)
-        self.hud_layer.add(self.round_label)
+        self.kills = 0
+        self.kills_label = cocos.text.Label(text='%s Kills' % self.kills,position=(736,130),font_size=15)
+        self.hud_layer.add(self.kills_label)
         
         
         ### Inventory/HUD
