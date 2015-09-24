@@ -142,6 +142,8 @@ class GameLayer(ScrollableLayer):
         
         self.rifle = Sprite("resources/weapon_sprites/rifle.png")
         self.player_sprite.add(self.rifle)
+        self.rifle.do(MoveBy((10,4),0))
+        
         
         ###
         ##
