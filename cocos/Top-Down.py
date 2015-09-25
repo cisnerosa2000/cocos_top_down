@@ -43,6 +43,56 @@ one_eighty_over_pi = 57.2957795131
 ##
 #
 
+class MainMenu(cocos.menu.Menu):
+
+    def __init__(self):
+        super(MainMenu, self).__init__('Top Down')
+
+        items = []
+
+        items.append(cocos.menu.MenuItem('New game', self.on_new_game))
+        items.append(cocos.menu.MenuItem('Options', self.on_options))
+        items.append(cocos.menu.MenuItem('Quit', self.on_quit))
+
+        self.create_menu(items)
+
+    def on_new_game(self):
+        global game_scene
+        game_scene = Scene()
+        game_scene.add(GameLayer())
+        director.push(game_scene)
+    def on_options(self):
+        self.parent.switch_to(1)
+
+    def on_quit(self):
+        pyglet.app.exit()
+
+
+class OptionsMenu(cocos.menu.Menu):
+    def __init__(self):
+        super(OptionsMenu, self).__init__('Top Down')
+
+        items = []
+
+        items.append(cocos.menu.ToggleMenuItem(
+            'Show FPS:',
+            self.on_show_fps,
+            cocos.director.director.show_FPS)
+        )
+        items.append(cocos.menu.MenuItem('Fullscreen', self.on_fullscreen))
+        items.append(cocos.menu.MenuItem('Back', self.on_quit))
+        self.create_menu(items)
+
+    def on_fullscreen(self):
+        cocos.director.director.window.set_fullscreen(
+            not cocos.director.director.window.fullscreen)
+
+    def on_quit(self):
+        self.parent.switch_to(0)
+
+    def on_show_fps(self, value):
+        cocos.director.director.show_FPS = value
+
 class PlayerCollider(cocos.tiles.RectMapCollider):
    def __init__(self, player):
        self.player = player
@@ -201,9 +251,7 @@ class GameLayer(ScrollableLayer):
         #
         
         
-        self.p = Sun()
-        self.p.position = (400,400)
-        self.map.add(self.p)
+        
         
 
         
@@ -226,6 +274,7 @@ class GameLayer(ScrollableLayer):
         
         self.player_sprite.cshape.center = self.player_sprite.position
         collisions = self.collision_manager.objs_colliding(self.player_sprite)
+        
         if collisions:
             print collisions
         
@@ -268,15 +317,9 @@ class GameLayer(ScrollableLayer):
         
         
         
-        self.last = self.player_sprite.get_rect()
         
         self.player_sprite.position = x,y
-        
-        self.new = self.last.copy()
-        self.new.x = x
-        self.new.y = y
-        
-        self.collider.collide_map(self.map, self.last, self.new, self.last.x-x, self.last.y-y)
+       
         
         
         
@@ -374,6 +417,6 @@ class GameLayer(ScrollableLayer):
 
 if __name__ == "__main__":
     director.init(width=800,height=608,caption="Top-Down",fullscreen=False)
-    game_scene = Scene()
-    game_scene.add(GameLayer())
-    director.run(game_scene)
+    scene = cocos.scene.Scene()
+    scene.add(cocos.layer.MultiplexLayer(MainMenu(), OptionsMenu()), z=1)
+    cocos.director.director.run(scene)
