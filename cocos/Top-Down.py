@@ -251,7 +251,9 @@ class GameLayer(ScrollableLayer):
         #
         
         
-        
+        self.p = Sun()
+        self.p.position = (400,400)
+        self.map.add(self.p)
         
 
         
